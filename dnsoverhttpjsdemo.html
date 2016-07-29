@@ -1,0 +1,97 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>DNS over HTTP JavaScript Client</title>
+</head>
+<body>
+<p>
+This is a demonstration of using raw DNS packets to do resolution,
+tunneled over HTTP. It uses the DNS over HTTP protocol documented in
+<a href="https://datatracker.ietf.org/doc/draft-song-dns-wireformat-http/">
+draft-song-dns-wireformat-http</a>.
+</p>
+<p>
+On the browser side, a JavaScript program builds a DNS wire-format
+packet, and then submits it to the server side via a HTTP POST. The
+program uses the 
+<a href="https://github.com/tjfontaine/native-dns-packet">native-dns-packet</a> 
+JavaScript library combined with the code using the
+<a href="http://browserify.org/">Browserify</a> tool:
+</p><pre>   $ npm install native-dns-packet
+   $ npm install buffercursor
+   $ browserify test.js -o dnsoverhttpjsdemo.js
+</pre>
+<p></p>
+<p>
+On the server side, the DNS over HTTP server proxy written in Go is
+run, with a couple of modifications:
+</p><ul>
+<li>It was modified to act as an HTTP server when the
+    <tt>/.well-known/dns-wireformat</tt> URL is not used. This allows
+    it to serve HTML documents, which is necessary since JavaScript
+    requires that all communication is with the same server that the
+    script itself comes from.
+</li><li>The type specifying the DNS transport requested was changed to
+    <b>X-Proxy-DNS-Transport</b> since the browser will not add
+    unknown header fields when sending a POST command.
+</li></ul>
+<p>
+Source for the server proxy can be found at:<br>
+</p><blockquote>
+<a href="https://github.com/BII-Lab/DNSoverHTTPinGO">
+https://github.com/BII-Lab/DNSoverHTTPinGO</a>.
+</blockquote>
+<p>
+Source for the browser JavaScript can be found at:<br>
+</p>
+<blockquote>
+<a href="https://github.com/BII-Lab/DNSoverHTTPinJavaScript">
+https://github.com/BII-Lab/DNSoverHTTPinJavaScript</a>.
+</blockquote>
+<p>
+You can try the proxy here. It has a small list of QTYPE, but there is
+no reason that any QTYPE could not be added. It doesn't do any DNSSEC
+validation, but it does provide the resource records if you turn on
+the DO bit.
+</p>
+<p>
+The code is PROOF-OF-CONCEPT only, and written by a non-JavaScript
+programmer. Please don't use it for any serious purposes.
+</p>
+<form name="dnslookup" id="dnslookup" action="null" onsubmit="return false">
+<table border="0">
+<tbody><tr>
+<td><b>QNAME</b></td>
+<td><input name="qname" id="qname" maxlength="255" type="text"> <i>Hostname, like "www.example.net"</i>
+</td></tr>
+<tr>
+<td><b>QTYPE</b></td>
+<td> <select name="qtype" id="qtype" size="0">
+                 <option value="1">A
+                 </option><option value="2">NS
+                 </option><option value="5">CNAME
+                 </option><option value="6">SOA
+                 </option><option value="12">PTR
+                 </option><option value="15">MX
+                 </option><option value="16">TXT
+                 </option><option value="28" selected="selected">AAAA
+                 </option><option value="255">ANY
+                 </option></select> </td>
+</tr>
+<tr>
+<td><b>QCLASS</b></td>
+<td><select name="qclass" id="qclass" size="0">
+                 <option selected="selected" value="1">IN
+                 </option><option value="3">CH
+                 </option></select></td>
+</tr>
+<tr>
+<td><b>DO</b></td>
+<td><input name="DO" id="DO" checked="checked" type="checkbox">
+</td></tr>
+</tbody></table>
+<input name="cmdDNSoverHTTP" id="cmdDNSoverHTTP" value="DNS over HTTP Query" style="position:absolute; left: -9999px" disabled="disabled" type="submit">
+</form>
+<pre><p id="result">
+</p></pre>
+<script src="dnsoverhttpjsdemo.js"></script>
+</body></html>
