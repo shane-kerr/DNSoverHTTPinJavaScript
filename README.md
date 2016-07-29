@@ -19,13 +19,17 @@ To use it:
 2. Then install the native-dns-packet library and the buffercursor
    library that it depends on:
 
+```
     $ npm install native-dns-packet
     $ npm install buffercursor
+```
 
 3. Finally, use Browserify to create JavaScript that can be included
    in an HTML:
 
+```
     $ browserify dnsoverhttpjsdemo-src.js -o dnsoverhttpjsdemo.js
+```
 
 You can copy the `dnsoverhttpjsdemo.html` and `dnsoverhttpjsdemo.js`
 to any web server and connect to it with a browser.
